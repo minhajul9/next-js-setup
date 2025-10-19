@@ -1,0 +1,4 @@
+services:
+  app:
+    environment:
+      - NEXT_PUBLIC_BASE_URL=http://host.docker.internal:5000/api/v1 
