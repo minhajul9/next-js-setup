@@ -40,3 +40,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - create an env file
 - npm i
 - update urls
+
+# Updates for hosting
+- add next.config.ts file for
+- install sharp for image optimization
