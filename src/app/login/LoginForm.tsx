@@ -50,7 +50,7 @@ export default function LoginForm() {
 
             setIsPending(true)
 
-            const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/auth/login`, {
+            const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
                 method: "POST",
                 credentials: "include",
                 body: JSON.stringify(values),
