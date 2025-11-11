@@ -43,48 +43,57 @@ export default function LoginForm() {
   const router = useRouter();
 
 
-  const userLogin = async (data: LoginFormValues) => {
+  async function onSubmit(values: LoginFormValues) {
+        try {
+            // const res = await axiosPrivate.post("/admin/auth/login", values);
+            // console.log("Login Success: ", res);
 
-    const res = await axiosPrivate.post("/auth/login", data)
+            setIsPending(true)
 
-    return res.data;
-  }
+            const data = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/auth/login`, {
+                method: "POST",
+                credentials: "include",
+                body: JSON.stringify(values),
+                headers: {
+                    "content-type": "application/json"
+                }
+            });
 
+            const res = await data.json();
 
-  const { mutate: loginFunction, isPending } = useMutation({
-    mutationFn: userLogin,
-    onSuccess: (data) => {
-      // Handle successful login, e.g., redirect or show success message
-
-
-      setAuth({
-        accessToken: data.data.accessToken,
-        user: data.data.user,
-        isLoading: false,
-      })
-
-      const type = searchParams.get("type")
-      const slug = searchParams.get("slug")
-
-      if (type && slug) {
-        router.push(`/${type}/${slug}`)
-      }
-      else {
-        router.push("/profile")
-      }
-
-
-    },
-    onError: (error) => {
-      // Handle error, e.g., show error message
-      console.error("Login failed:", error);
-    },
-  });
-
-
-  const onSubmit = async (data: LoginFormValues) => {
-    loginFunction(data);
-  };
+            if (res.statusCode === 401 && res.status !== 200) {
+                toast.warning(res.message, {
+                    position: "top-center",
+                });
+            }
+            else {
+                setAuth({
+                    accessToken: res.data.accessToken,
+                    isLoading: false,
+                    user: res.data.user,
+                });
+                router.push("/dashboard");
+            }
+        } catch (error) {
+            console.log('error');
+            if (error instanceof AxiosError) {
+                toast.warning(error.response?.data.message, {
+                    position: "top-center",
+                });
+            } else {
+                toast.error("Something went wrong.", {
+                    position: "top-center",
+                });
+            }
+            setAuth((prev) => {
+                return {
+                    ...prev,
+                    isLoading: false,
+                };
+            });
+        }
+        finally { setIsPending(true) }
+    }
 
   const handleGoogleLogin = async () => {
     try {
